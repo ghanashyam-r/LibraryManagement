@@ -13,16 +13,21 @@
 <body>
     
     <div id="app">
-        <h1>[$ message $]</h1>
-        <p>Heyy</p>
+        <router-view></router-view>
     </div>
-    <script>
+    <script type="module">
+        import HomeView from '../static/views/HomeView.js'
+        const routes= [
+            {path : '/', component: HomeView}
+    ];
+        const router = new VueRouter({
+            routes
+        });
         var app = new Vue({
             el: '#app',
             delimiters: ['[$', '$]'],
-            data: {
-                message: 'Hello Vue!'
-            }
+            router: router,
+           
         })
         
     </script>
