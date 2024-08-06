@@ -31,11 +31,32 @@ const LoginView = Vue.component('LoginView', {
     },
     methods: {
         login() {
-            // Implement login functionality here
-            console.log('Login clicked');
-            console.log('Username:', this.username);
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: this.username,
+                    password: this.password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.msg === "login successful") {
+                    // Save the token to localStorage
+                    localStorage.setItem('access_token', data.access_token); // Ensure your backend returns this token
+                    this.$router.push('/dashboard');
+                } else {
+                    alert(data.msg);
+                }
+            })
+            .catch(error => {
+                console.error('Login Error:', error);
+            });
+        }
+        
     }
-}    
 });
 
 export default LoginView;

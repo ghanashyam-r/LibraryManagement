@@ -17,11 +17,13 @@
         import HomeView from '../static/views/HomeView.js';
         import LoginView from '../static/views/Login.js';
         import RegisterView from '../static/views/Register.js';
+        import UserDashboard from '../static/views/UserDashboard.js';
 
         const routes = [
             { path: '/', component: HomeView },
             { path: '/login', component: LoginView },
-            { path: '/register', component: RegisterView }
+            { path: '/register', component: RegisterView },
+            { path: '/dashboard', component: UserDashboard}
         ];
 
         const router = new VueRouter({
