@@ -44,9 +44,16 @@ const LoginView = Vue.component('LoginView', {
             .then(response => response.json())
             .then(data => {
                 if (data.msg === "login successful") {
-                    // Save the token to localStorage
+                    // Save the token and user role to localStorage
                     localStorage.setItem('access_token', data.access_token); // Ensure your backend returns this token
-                    this.$router.push('/dashboard');
+                    localStorage.setItem('user_role', data.role); // Save the role for future use
+
+                    // Redirect based on role
+                    if (data.role === 'admin') {
+                        this.$router.push('/librariandashboard');
+                    } else {
+                        this.$router.push('/userdashboard');
+                    }
                 } else {
                     alert(data.msg);
                 }
@@ -55,8 +62,8 @@ const LoginView = Vue.component('LoginView', {
                 console.error('Login Error:', error);
             });
         }
-        
     }
 });
 
 export default LoginView;
+

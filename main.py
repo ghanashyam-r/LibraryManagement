@@ -46,7 +46,6 @@ def signup_post():
         return jsonify({'message': 'User created'}), 201
 
 @app.route('/login', methods=['POST'])
-@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get("username")
@@ -54,7 +53,7 @@ def login():
     user = User.query.filter_by(username=username).first()
     if user and check_password_hash(user.password_hash, password):
         access_token = create_access_token(identity=user)
-        response = jsonify({"msg": "login successful", "access_token": access_token})
+        response = jsonify({"msg": "login successful", "access_token": access_token, "role": user.role})
         set_access_cookies(response, access_token)
         return response
     return jsonify({"msg": "Invalid username or password"}), 401

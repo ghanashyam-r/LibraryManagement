@@ -18,12 +18,14 @@
         import LoginView from '../static/views/Login.js';
         import RegisterView from '../static/views/Register.js';
         import UserDashboard from '../static/views/UserDashboard.js';
+        import LibrarianDashboard from '../static/views/LibrarianDashboard.js';
 
         const routes = [
             { path: '/', component: HomeView },
             { path: '/login', component: LoginView },
             { path: '/register', component: RegisterView },
-            { path: '/dashboard', component: UserDashboard}
+            { path: '/dashboard', component: UserDashboard},
+            { path: '/librariandashboard', component: LibrarianDashboard}
         ];
 
         const router = new VueRouter({
