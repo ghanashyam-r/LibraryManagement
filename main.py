@@ -30,6 +30,21 @@ def user_lookup_callback(_jwt_header, _jwt_data):
     identity = _jwt_data['sub']
     return User.query.get(identity)  # Corrected to return a User instance
 
+auth = Blueprint('auth', __name__)
+@app.route('/register', methods=['POST'])
+def signup_post():
+    data = request.get_json()
+    user = User.query.filter_by(email=data["email"]).first()
+    if user:
+        return jsonify({'error': 'User already exists'}), 409
+    else:
+        new_user = User(email=data["email"], username=data["username"],
+                        role='user',
+                        password_hash=generate_password_hash(data["password"],
+                                                        method='pbkdf2:sha256'))
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({'message': 'User created'}), 201
 
 @app.route('/')
 def index():
