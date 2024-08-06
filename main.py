@@ -1,14 +1,15 @@
-from flask import Flask, render_template, session, jsonify, request, Blueprint
+# main.py
+from flask import Flask, render_template, jsonify, request, Blueprint
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
-from database import db  
-from models import User, Section, Book, Request, Feedback  
+from database import db
+from models import User, Section, Book
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 app.secret_key = 'fefsdsdsfdsfr'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Suppress the warning
-app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # Change this to a secure key
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
 
 jwt = JWTManager(app)
 db.init_app(app)
@@ -29,7 +30,7 @@ def user_identity_lookup(user):
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, _jwt_data):
     identity = _jwt_data['sub']
-    return User.query.get(identity)  # Corrected to return a User instance
+    return User.query.get(identity)
 
 auth = Blueprint('auth', __name__)
 
@@ -58,7 +59,6 @@ def login():
         return response
     return jsonify({"msg": "Invalid username or password"}), 401
 
-
 @app.route('/logout', methods=['POST'])
 def logout():
     response = jsonify({"msg": "logout successful"})
@@ -77,6 +77,136 @@ def user_info():
         }), 200
     else:
         return jsonify({'error': 'User not found'}), 404
+
+# Section Management Routes
+@app.route('/sections', methods=['POST'])
+@jwt_required()
+def create_section():
+    data = request.get_json()
+    new_section = Section(name=data['name'], description=data['description'])
+    db.session.add(new_section)
+    db.session.commit()
+    return jsonify({'message': 'Section created'}), 201
+
+@app.route('/sections', methods=['GET'])
+@jwt_required()
+def get_sections():
+    sections = Section.query.all()
+    return jsonify([{
+        'id': section.id,
+        'name': section.name,
+        'date_created': section.date_created,
+        'description': section.description
+    } for section in sections]), 200
+
+@app.route('/sections/<int:section_id>', methods=['PUT'])
+@jwt_required()
+def update_section(section_id):
+    data = request.get_json()
+    section = Section.query.get(section_id)
+    if not section:
+        return jsonify({'message': 'Section not found'}), 404
+    section.name = data['name']
+    section.description = data['description']
+    db.session.commit()
+    return jsonify({'message': 'Section updated'}), 200
+
+@app.route('/sections/<int:section_id>', methods=['DELETE'])
+@jwt_required()
+def delete_section(section_id):
+    section = Section.query.get(section_id)
+    if not section:
+        return jsonify({'message': 'Section not found'}), 404
+    db.session.delete(section)
+    db.session.commit()
+    return jsonify({'message': 'Section deleted'}), 200
+
+# eBook Management Routes
+@app.route('/sections/<int:section_id>/books', methods=['GET'])
+@jwt_required()
+def get_books_by_section(section_id):
+    books = Book.query.filter_by(section_id=section_id).all()
+    return jsonify([{
+        'id': book.id,
+        'name': book.name,
+        'content': book.content,
+        'author': book.author,
+        'date_issued': book.date_issued,
+        'return_date': book.return_date,
+        'section_id': book.section_id
+    } for book in books]), 200
+
+@app.route('/books', methods=['GET'])
+@jwt_required()
+def get_books():
+    books = Book.query.all()
+    return jsonify([{
+        'id': book.id,
+        'name': book.name,
+        'content': book.content,
+        'author': book.author,
+        'date_issued': book.date_issued,
+        'return_date': book.return_date,
+        'section_id': book.section_id
+    } for book in books]), 200
+
+@app.route('/sections/<int:section_id>/books', methods=['POST'])
+@jwt_required()
+def create_book(section_id):
+    data = request.get_json()
+    new_book = Book(
+        name=data['name'],
+        content=data['content'],
+        author=data['author'],
+        date_issued=data.get('date_issued'),  # Add default values if not provided
+        return_date=data.get('return_date'),
+        section_id=section_id
+    )
+    db.session.add(new_book)
+    db.session.commit()
+    return jsonify({
+        'id': new_book.id,
+        'name': new_book.name,
+        'content': new_book.content,
+        'author': new_book.author,
+        'date_issued': new_book.date_issued,
+        'return_date': new_book.return_date,
+        'section_id': new_book.section_id
+    }), 201
+
+@app.route('/books/<int:book_id>', methods=['PUT'])
+@jwt_required()
+def update_book(book_id):
+    data = request.get_json()
+    book = Book.query.get(book_id)
+    if not book:
+        return jsonify({'message': 'Book not found'}), 404
+    book.name = data['name']
+    book.content = data['content']
+    book.author = data['author']
+    book.date_issued = data['date_issued']
+    book.return_date = data['return_date']
+    book.section_id = data['section_id']
+    db.session.commit()
+    return jsonify({
+        'id': book.id,
+        'name': book.name,
+        'content': book.content,
+        'author': book.author,
+        'date_issued': book.date_issued,
+        'return_date': book.return_date,
+        'section_id': book.section_id
+    }), 200
+
+@app.route('/books/<int:book_id>', methods=['DELETE'])
+@jwt_required()
+def delete_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return jsonify({'message': 'Book not found'}), 404
+    db.session.delete(book)
+    db.session.commit()
+    return jsonify({'message': 'Book deleted'}), 200
 
 @app.route('/')
 def index():

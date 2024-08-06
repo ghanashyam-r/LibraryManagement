@@ -19,13 +19,17 @@
         import RegisterView from '../static/views/Register.js';
         import UserDashboard from '../static/views/UserDashboard.js';
         import LibrarianDashboard from '../static/views/LibrarianDashboard.js';
+        import ManageSections from '../static/views/ManageSections.js';
+        import ManageBooks from '../static/views/ManageBooks.js';
 
         const routes = [
             { path: '/', component: HomeView },
             { path: '/login', component: LoginView },
             { path: '/register', component: RegisterView },
             { path: '/dashboard', component: UserDashboard},
-            { path: '/librariandashboard', component: LibrarianDashboard}
+            { path: '/librariandashboard', component: LibrarianDashboard},
+            { path: '/manage-sections', component: ManageSections },
+            { path: '/manage-books', component: ManageBooks }
         ];
 
         const router = new VueRouter({
