@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, jsonify, request
+from flask import Flask, render_template, session, jsonify, request,Blueprint
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required,get_jwt_identity
 from database import db  # Ensure this is imported correctly
 from models import User, Section, Book, Request, Feedback  # Import your models

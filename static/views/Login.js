@@ -35,6 +35,7 @@ const LoginView = Vue.component('LoginView', {
             console.log('Login clicked');
             console.log('Username:', this.username);
     }
+}    
 });
 
 export default LoginView;
