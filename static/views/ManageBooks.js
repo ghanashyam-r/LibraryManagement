@@ -68,23 +68,24 @@ const ManageBooks = Vue.component('ManageBooks', {
         };
     },
     created() {
-        this.fetchBooks();
         this.fetchSections();
     },
     methods: {
         fetchBooks() {
-            fetch(`/sections/${this.book.section_id}/books`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.getToken()}`
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.books = data;
-            })
-            .catch(error => console.error('Error:', error));
+            if (this.book.section_id) {
+                fetch(`/sections/${this.book.section_id}/books`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.getToken()}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.books = Array.isArray(data) ? data : [];
+                })
+                .catch(error => console.error('Error:', error));
+            }
         },
         fetchSections() {
             fetch(`/sections`, {
@@ -96,7 +97,16 @@ const ManageBooks = Vue.component('ManageBooks', {
             })
             .then(response => response.json())
             .then(data => {
-                this.sections = data;
+                if (Array.isArray(data)) {
+                    this.sections = data;
+                    // Fetch books for the initial section or handle if section_id is not set
+                    if (this.book.section_id) {
+                        this.fetchBooks();
+                    }
+                } else {
+                    console.error('Expected an array but received:', data);
+                    this.sections = [];
+                }
             })
             .catch(error => console.error('Error:', error));
         },
@@ -123,12 +133,11 @@ const ManageBooks = Vue.component('ManageBooks', {
                 content: this.book.content,
                 author: this.book.author,
                 date_issued: this.book.date_issued,
-                return_date: this.book.return_date
+                return_date: this.book.return_date,
+                section_id: this.book.section_id
             };
-            
-            const sectionId = this.book.section_id;  // Ensure section ID is used correctly
-        
-            fetch(`http://127.0.0.1:5000/sections/${sectionId}/books`, {
+
+            fetch(`/sections/${this.book.section_id}/books`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -151,19 +160,41 @@ const ManageBooks = Vue.component('ManageBooks', {
                 console.error('There was a problem with your fetch operation:', error);
             });
         },
-        fetchBooks() {
-            fetch(`/books`, {
-                method: 'GET',
+        updateBook() {
+            const bookData = {
+                name: this.book.name,
+                content: this.book.content,
+                author: this.book.author,
+                date_issued: this.book.date_issued,  // Ensure this is in 'YYYY-MM-DD' format
+                return_date: this.book.return_date,  // Ensure this is in 'YYYY-MM-DD' format
+                section_id: this.book.section_id
+            };
+    
+            fetch(`/books/${this.book.id}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.getToken()}`
+                },
+                body: JSON.stringify(bookData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
                 }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
-                this.books = data;
+                const index = this.books.findIndex(b => b.id === this.book.id);
+                if (index !== -1) {
+                    this.books[index] = data;
+                }
+                this.hideForm();
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+                alert('Error: ' + error.message);  // Display error message to user
+            });
         },
         deleteBook(id) {
             fetch(`/books/${id}`, {
@@ -193,5 +224,3 @@ const ManageBooks = Vue.component('ManageBooks', {
 });
 
 export default ManageBooks;
-
-
