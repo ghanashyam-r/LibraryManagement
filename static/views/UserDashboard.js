@@ -1,6 +1,17 @@
 const UserDashboard = Vue.component('UserDashboard', {
     template: `
         <div class="container">
+            <nav class="navbar navbar-light bg-light mb-4">
+                <a class="navbar-brand" href="#">Library Management</a>
+                <form class="form-inline" @submit.prevent="search">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search books or sections" v-model="searchQuery" />
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+                <div class="navbar-text ml-auto">
+                    <span class="mr-2">Username: {{ user.username }}</span>
+                    <span>Email: {{ user.email }}</span>
+                </div>
+            </nav>
             <div class="row">
                 <div class="col-12">
                     <h2 class="mt-5">Welcome, {{ user.username }}!</h2>
@@ -16,6 +27,24 @@ const UserDashboard = Vue.component('UserDashboard', {
                             Logout
                         </router-link>
                     </div>
+                    <div class="mt-4">
+                        <h3>Available Books</h3>
+                        <div v-for="book in filteredBooks" :key="book.id" class="card mb-2">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ book.name }}</h5>
+                                <p class="card-text">{{ book.author }}</p>
+                                <p class="card-text"><strong>Section:</strong> {{ book.section_name }}</p>
+                                <button @click="requestBook(book.id)" class="btn btn-primary" :disabled="book.requested">Request Book</button>
+                                <button @click="returnBook(book.id)" class="btn btn-warning" :disabled="!book.requested">Return Book</button>
+                                <div class="mt-3">
+                                    <h6>Give Feedback</h6>
+                                    <input v-model="feedback[book.id].rating" placeholder="Rating" type="number" min="1" max="5" class="form-control">
+                                    <textarea v-model="feedback[book.id].comment" placeholder="Comment" class="form-control mt-2"></textarea>
+                                    <button @click="giveFeedback(book.id)" class="btn btn-success mt-2">Submit Feedback</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -25,11 +54,26 @@ const UserDashboard = Vue.component('UserDashboard', {
             user: {
                 username: '',
                 email: ''
-            }
+            },
+            books: [],
+            feedback: {},
+            searchQuery: ''
         };
+    },
+    computed: {
+        filteredBooks() {
+            if (!this.searchQuery) return this.books;
+            const query = this.searchQuery.toLowerCase();
+            return this.books.filter(book => 
+                book.name.toLowerCase().includes(query) ||
+                book.author.toLowerCase().includes(query) ||
+                book.section_name.toLowerCase().includes(query)
+            );
+        }
     },
     created() {
         this.fetchUserData();
+        this.fetchBooks();
     },
     methods: {
         fetchUserData() {
@@ -53,8 +97,91 @@ const UserDashboard = Vue.component('UserDashboard', {
                 console.error('Fetch Error:', error);
             });
         },
+        fetchBooks() {
+            fetch('/books', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.books = data;
+                this.books.forEach(book => {
+                    this.$set(this.feedback, book.id, { rating: '', comment: '' });
+                });
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+            });
+        },
+        requestBook(bookId) {
+            fetch(`/books/${bookId}/request`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(data.message);
+                    this.fetchBooks();
+                }
+            })
+            .catch(error => {
+                console.error('Request Error:', error);
+            });
+        },
+        returnBook(bookId) {
+            fetch(`/books/${bookId}/return`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(data.message);
+                    this.fetchBooks();
+                }
+            })
+            .catch(error => {
+                console.error('Return Error:', error);
+            });
+        },
+        giveFeedback(bookId) {
+            const feedbackData = this.feedback[bookId];
+            fetch(`/books/${bookId}/feedback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                },
+                body: JSON.stringify(feedbackData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(data.message);
+                    this.feedback[bookId] = { rating: '', comment: '' };
+                }
+            })
+            .catch(error => {
+                console.error('Feedback Error:', error);
+            });
+        },
         getToken() {
-            // Retrieve token from localStorage or cookies
             return localStorage.getItem('access_token'); // Adjust if using cookies
         },
         logout() {
@@ -73,6 +200,9 @@ const UserDashboard = Vue.component('UserDashboard', {
             .catch(error => {
                 console.error('Logout Error:', error);
             });
+        },
+        search() {
+            // The search functionality is already handled by the computed property filteredBooks
         }
     }
 });

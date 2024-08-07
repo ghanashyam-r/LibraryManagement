@@ -139,16 +139,25 @@ def get_books_by_section(section_id):
 @app.route('/books', methods=['GET'])
 @jwt_required()
 def get_books():
-    books = Book.query.all()
-    return jsonify([{
-        'id': book.id,
-        'name': book.name,
-        'content': book.content,
-        'author': book.author,
-        'date_issued': book.date_issued,
-        'return_date': book.return_date,
-        'section_id': book.section_id
-    } for book in books]), 200
+    books = db.session.query(
+        Book.id, Book.name, Book.content, Book.author, Book.date_issued, Book.return_date, Book.section_id, Section.name.label('section_name')
+    ).join(Section, Book.section_id == Section.id).all()
+    
+    book_list = []
+    for book in books:
+        book_list.append({
+            'id': book.id,
+            'name': book.name,
+            'content': book.content,
+            'author': book.author,
+            'date_issued': book.date_issued,
+            'return_date': book.return_date,
+            'section_id': book.section_id,
+            'section_name': book.section_name
+        })
+
+    return jsonify(book_list), 200
+
 
 from datetime import datetime
 
@@ -232,6 +241,51 @@ def delete_book(book_id):
     db.session.delete(book)
     db.session.commit()
     return jsonify({'message': 'Book deleted'}), 200
+@app.route('/books/<int:book_id>/request', methods=['POST'])
+@jwt_required()
+def request_book(book_id):
+    current_user = get_jwt_identity()
+    user = User.query.get(current_user)
+    
+    # Check if user has already requested 5 books
+    if Request.query.filter_by(user_id=user.id, date_returned=None).count() >= 5:
+        return jsonify({'error': 'You can only request a maximum of 5 books at a time.'}), 403
+
+    new_request = Request(user_id=user.id, book_id=book_id, status='requested')
+    db.session.add(new_request)
+    db.session.commit()
+    return jsonify({'message': 'Book requested successfully.'}), 201
+
+@app.route('/books/<int:book_id>/return', methods=['POST'])
+@jwt_required()
+def return_book(book_id):
+    current_user = get_jwt_identity()
+    user = User.query.get(current_user)
+    
+    # Find the request record
+    request_record = Request.query.filter_by(user_id=user.id, book_id=book_id, date_returned=None).first()
+    if not request_record:
+        return jsonify({'error': 'No record of this book being borrowed.'}), 404
+
+    request_record.date_returned = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'message': 'Book returned successfully.'}), 200
+@app.route('/books/<int:book_id>/feedback', methods=['POST'])
+@jwt_required()
+def give_feedback(book_id):
+    data = request.get_json()
+    current_user = get_jwt_identity()
+    user = User.query.get(current_user)
+    
+    new_feedback = Feedback(
+        user_id=user.id,
+        book_id=book_id,
+        rating=data['rating'],
+        comment=data['comment']
+    )
+    db.session.add(new_feedback)
+    db.session.commit()
+    return jsonify({'message': 'Feedback submitted successfully.'}), 201
 
 @app.route('/')
 def index():
