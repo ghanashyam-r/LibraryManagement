@@ -2,7 +2,7 @@
 from flask import Flask, render_template, jsonify, request, Blueprint
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
 from database import db
-from models import User, Section, Book
+from models import User, Section, Book,Request, Feedback
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -159,7 +159,7 @@ def get_books():
     return jsonify(book_list), 200
 
 
-from datetime import datetime
+from datetime import datetime,timedelta
 
 @app.route('/sections/<int:section_id>/books', methods=['POST'])
 @jwt_required()
@@ -287,6 +287,48 @@ def give_feedback(book_id):
     db.session.commit()
     return jsonify({'message': 'Feedback submitted successfully.'}), 201
 
+
+# Librarian functionalities
+@app.route('/requests', methods=['GET'])
+@jwt_required()
+def get_requests():
+    requests = db.session.query(
+        Request.id, 
+        User.username.label('user'), 
+        Book.name.label('book'), 
+        Request.status
+    ).join(User, Request.user_id == User.id).join(Book, Request.book_id == Book.id).all()
+    
+    return jsonify([{
+        'id': req.id,
+        'user': req.user,
+        'book': req.book,
+        'status': req.status
+    } for req in requests]), 200
+
+@app.route('/requests/<int:request_id>/approve', methods=['POST'])
+@jwt_required()
+def approve_request(request_id):
+    request_record = Request.query.get(request_id)
+    if not request_record:
+        return jsonify({'error': 'Request not found'}), 404
+
+    request_record.status = 'approved'
+    request_record.date_approved = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'message': 'Request approved successfully.'}), 200
+
+@app.route('/requests/<int:request_id>/revoke', methods=['POST'])
+@jwt_required()
+def revoke_request(request_id):
+    request_record = Request.query.get(request_id)
+    if not request_record:
+        return jsonify({'error': 'Request not found'}), 404
+
+    request_record.status = 'revoked'
+    request_record.date_returned = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'message': 'Request revoked successfully.'}), 200
 @app.route('/')
 def index():
     return render_template('index.html')
