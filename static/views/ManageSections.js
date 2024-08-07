@@ -21,10 +21,26 @@ const ManageSections = Vue.component('ManageSections', {
                         <li v-for="section in sections" :key="section.id" class="list-group-item">
                             <h5>{{ section.name }}</h5>
                             <p>{{ section.description }}</p>
-                            <button @click="editSection(section)" class="btn btn-warning btn-sm">Edit</button>
+                            <button @click="startEditSection(section)" class="btn btn-warning btn-sm">Edit</button>
                             <button @click="deleteSection(section.id)" class="btn btn-danger btn-sm">Delete</button>
                         </li>
                     </ul>
+
+                    <div v-if="editedSection" class="mt-5">
+                        <h3>Edit Section</h3>
+                        <form @submit.prevent="updateSection">
+                            <div class="mb-3">
+                                <label for="editSectionName" class="form-label">Section Name</label>
+                                <input type="text" v-model="editedSection.name" class="form-control" id="editSectionName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editSectionDescription" class="form-label">Description</label>
+                                <textarea v-model="editedSection.description" class="form-control" id="editSectionDescription"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Section</button>
+                            <button @click="cancelEdit" class="btn btn-secondary">Cancel</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,9 +94,27 @@ const ManageSections = Vue.component('ManageSections', {
                 console.error('Create Section Error:', error);
             });
         },
-        editSection(section) {
+        startEditSection(section) {
             this.editedSection = { ...section };
-            // Logic for updating the section goes here
+        },
+        updateSection() {
+            fetch(`/sections/${this.editedSection.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                },
+                body: JSON.stringify(this.editedSection)
+            })
+            .then(response => response.json())
+            .then(updatedSection => {
+                const index = this.sections.findIndex(section => section.id === updatedSection.id);
+                this.$set(this.sections, index, updatedSection);
+                this.editedSection = null;
+            })
+            .catch(error => {
+                console.error('Update Section Error:', error);
+            });
         },
         deleteSection(sectionId) {
             fetch(`/sections/${sectionId}`, {
@@ -98,6 +132,9 @@ const ManageSections = Vue.component('ManageSections', {
             .catch(error => {
                 console.error('Delete Section Error:', error);
             });
+        },
+        cancelEdit() {
+            this.editedSection = null;
         },
         getToken() {
             return localStorage.getItem('access_token');

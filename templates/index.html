@@ -21,15 +21,17 @@
         import LibrarianDashboard from '../static/views/LibrarianDashboard.js';
         import ManageSections from '../static/views/ManageSections.js';
         import ManageBooks from '../static/views/ManageBooks.js';
+        import ManageRequestsView from '../static/views/ManageRequestsView.js';
 
         const routes = [
             { path: '/', component: HomeView },
             { path: '/login', component: LoginView },
             { path: '/register', component: RegisterView },
-            { path: '/dashboard', component: UserDashboard},
+            { path: '/userdashboard', component: UserDashboard},
             { path: '/librariandashboard', component: LibrarianDashboard},
             { path: '/manage-sections', component: ManageSections },
-            { path: '/manage-books', component: ManageBooks }
+            { path: '/manage-books', component: ManageBooks },
+            { path: '/manage-requests', component: ManageRequestsView }
         ];
 
         const router = new VueRouter({

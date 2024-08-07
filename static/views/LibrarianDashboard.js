@@ -16,6 +16,9 @@ const LibrarianDashboard = Vue.component('LibrarianDashboard', {
                         <router-link to="/view-statistics" class="list-group-item list-group-item-action">
                             View Statistics
                         </router-link>
+                        <router-link to="/manage-requests" class="list-group-item list-group-item-action">
+                            View and Manage User Requests
+                        </router-link>
                         <router-link to="/" class="list-group-item list-group-item-action" @click.prevent="logout">
                             Logout
                         </router-link>

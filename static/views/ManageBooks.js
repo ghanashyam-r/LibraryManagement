@@ -21,11 +21,11 @@ const ManageBooks = Vue.component('ManageBooks', {
                                 <input type="text" v-model="book.author" class="form-control" id="bookAuthor" required>
                             </div>
                             <div class="mb-3">
-                                <label for="dateIssued" class="form-label">Date Issued</label>
+                                <label for="dateIssued" class="form-label">Date Issued (optional)</label>
                                 <input type="date" v-model="book.date_issued" class="form-control" id="dateIssued">
                             </div>
                             <div class="mb-3">
-                                <label for="returnDate" class="form-label">Return Date</label>
+                                <label for="returnDate" class="form-label">Return Date (optional)</label>
                                 <input type="date" v-model="book.return_date" class="form-control" id="returnDate">
                             </div>
                             <div class="mb-3">
@@ -69,23 +69,22 @@ const ManageBooks = Vue.component('ManageBooks', {
     },
     created() {
         this.fetchSections();
+        this.fetchBooks(); // Fetch all books when the component is created
     },
     methods: {
         fetchBooks() {
-            if (this.book.section_id) {
-                fetch(`/sections/${this.book.section_id}/books`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.getToken()}`
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    this.books = Array.isArray(data) ? data : [];
-                })
-                .catch(error => console.error('Error:', error));
-            }
+            fetch(`/books`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.books = Array.isArray(data) ? data : [];
+            })
+            .catch(error => console.error('Error:', error));
         },
         fetchSections() {
             fetch(`/sections`, {
@@ -99,10 +98,6 @@ const ManageBooks = Vue.component('ManageBooks', {
             .then(data => {
                 if (Array.isArray(data)) {
                     this.sections = data;
-                    // Fetch books for the initial section or handle if section_id is not set
-                    if (this.book.section_id) {
-                        this.fetchBooks();
-                    }
                 } else {
                     console.error('Expected an array but received:', data);
                     this.sections = [];
@@ -132,8 +127,8 @@ const ManageBooks = Vue.component('ManageBooks', {
                 name: this.book.name,
                 content: this.book.content,
                 author: this.book.author,
-                date_issued: this.book.date_issued,
-                return_date: this.book.return_date,
+                date_issued: this.book.date_issued || null,
+                return_date: this.book.return_date || null,
                 section_id: this.book.section_id
             };
 
@@ -165,8 +160,8 @@ const ManageBooks = Vue.component('ManageBooks', {
                 name: this.book.name,
                 content: this.book.content,
                 author: this.book.author,
-                date_issued: this.book.date_issued,  // Ensure this is in 'YYYY-MM-DD' format
-                return_date: this.book.return_date,  // Ensure this is in 'YYYY-MM-DD' format
+                date_issued: this.book.date_issued || null,
+                return_date: this.book.return_date || null,
                 section_id: this.book.section_id
             };
     
