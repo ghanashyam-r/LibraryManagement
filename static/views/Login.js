@@ -1,24 +1,20 @@
 const LoginView = Vue.component('LoginView', {
     template: `
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="card mt-5">
-                        <div class="card-body">
-                            <h3 class="card-title text-center">Login</h3>
-                            <form @submit.prevent="login">
-                                <div class="mb-3">
-                                    <label for="username" class="form-label">Username</label>
-                                    <input type="text" v-model="username" class="form-control" id="username" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input type="password" v-model="password" class="form-control" id="password" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Login</button>
-                            </form>
+        <div class="d-flex justify-content-center align-items-start min-vh-100 bg-light">
+            <div class="card shadow-lg p-4 rounded mt-5" style="width: 100%; max-width: 400px;">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Login</h3>
+                    <form @submit.prevent="login">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" v-model="username" class="form-control" id="username" placeholder="Enter your username" required>
                         </div>
-                    </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" v-model="password" class="form-control" id="password" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -44,11 +40,9 @@ const LoginView = Vue.component('LoginView', {
             .then(response => response.json())
             .then(data => {
                 if (data.msg === "login successful") {
-                    // Save the token and user role to localStorage
-                    localStorage.setItem('access_token', data.access_token); // Ensure your backend returns this token
-                    localStorage.setItem('user_role', data.role); // Save the role for future use
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('user_role', data.role);
 
-                    // Redirect based on role
                     if (data.role === 'admin') {
                         this.$router.push('/librariandashboard');
                     } else {

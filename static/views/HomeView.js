@@ -1,25 +1,15 @@
 const HomeView = Vue.component('HomeView', {
     template: `
-        <div class="container">
-            <h1 class="mt-5">Welcome to the Library Management System</h1>
-            <p class="lead">Manage your library efficiently and effectively.</p>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Browse Books</h5>
-                            <p class="card-text">Explore our vast collection of books across various genres.</p>
-                            <a href="#" class="btn btn-primary">Browse</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Manage Requests</h5>
-                            <p class="card-text">Handle book requests from users efficiently.</p>
-                            <a href="#" class="btn btn-primary">Manage</a>
-                        </div>
+        <div class="home-container">
+            <div class="background-image"></div>
+            <div class="content-overlay">
+                <div class="jumbotron text-center">
+                    <h1 class="display-4">Welcome to the Ghanashyam's E Library!</h1>
+                    <p class="lead">Login or Register to enter into the magical world of books!</p>
+                    <hr class="my-4">
+                    <div class="d-flex justify-content-center mt-4">
+                        <router-link to="/login" class="btn btn-primary btn-lg mx-2">Login</router-link>
+                        <router-link to="/register" class="btn btn-secondary btn-lg mx-2">Register</router-link>
                     </div>
                 </div>
             </div>
@@ -27,11 +17,11 @@ const HomeView = Vue.component('HomeView', {
     `,
     data() {
         return {
-            // Any data properties you need for this component
+            
         };
     },
     methods: {
-        // Any methods you need for this component
+        
     }
 });
 

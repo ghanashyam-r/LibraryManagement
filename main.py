@@ -5,7 +5,6 @@ from database import db
 from models import User, Section, Book,Request, Feedback
 from werkzeug.security import check_password_hash, generate_password_hash
 from worker import celery_init_app
-import flask_excel as excel
 
 app = Flask(__name__)
 app.secret_key = 'fefsdsdsfdsfr'

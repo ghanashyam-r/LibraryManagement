@@ -2,15 +2,12 @@ const UserDashboard = Vue.component('UserDashboard', {
     template: `
         <div class="container">
             <nav class="navbar navbar-light bg-light mb-4">
-                <a class="navbar-brand" href="#">Library Management</a>
-                <form class="form-inline" @submit.prevent="search">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search books or sections" v-model="searchQuery" />
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <a class="navbar-brand" href="#">Library</a>
+                <form class="form-inline d-flex w-50" @submit.prevent="search">
+                    <input class="form-control mr-2 flex-grow-1" type="search" placeholder="Search books or sections" v-model="searchQuery" />
+                    <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
-                <div class="navbar-text ml-auto">
-                    <span class="mr-2">Username: {{ user.username }}</span>
-                    <span>Email: {{ user.email }}</span>
-                </div>
+                <!-- Removed username and email from navbar -->
             </nav>
             <div class="row">
                 <div class="col-12">
@@ -19,9 +16,6 @@ const UserDashboard = Vue.component('UserDashboard', {
                     <div class="list-group mt-4">
                         <router-link to="/borrowed-books" class="list-group-item list-group-item-action">
                             View Borrowed Books
-                        </router-link>
-                        <router-link to="/account-settings" class="list-group-item list-group-item-action">
-                            Account Settings
                         </router-link>
                         <router-link to="/" class="list-group-item list-group-item-action" @click.prevent="logout">
                             Logout
@@ -201,11 +195,7 @@ const UserDashboard = Vue.component('UserDashboard', {
                 console.error('Logout Error:', error);
             });
         },
-        search() {
-            // The search functionality is already handled by the computed property filteredBooks
-        }
     }
 });
 
 export default UserDashboard;
-

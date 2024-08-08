@@ -1,0 +1,69 @@
+.home-container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../assets/library.png');
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px);
+    z-index: 1;
+}
+
+.content-overlay {
+    position: relative;
+    z-index: 2; /* This ensures the content is above the blurred background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: to darken the overlay background */
+}
+
+.jumbotron {
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent background for the text */
+    padding: 2rem;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+
+
+
+
+
+
+.user-dashboard-container {
+    background-image: url('../assets/user.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px); /* Blurs the background image */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Ensure the background stays behind all content */
+}
+
+.user-dashboard-content {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background for the content */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+
+
+
+
+
