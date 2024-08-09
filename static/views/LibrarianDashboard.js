@@ -1,4 +1,3 @@
-
 const LibrarianDashboard = Vue.component('LibrarianDashboard', {
     template: `
         <div class="container">
@@ -19,6 +18,9 @@ const LibrarianDashboard = Vue.component('LibrarianDashboard', {
                         <router-link to="/manage-requests" class="list-group-item list-group-item-action">
                             View and Manage User Requests
                         </router-link>
+                        <button @click="exportBooksCSV" class="list-group-item list-group-item-action">
+                            Export Books as CSV
+                        </button>
                         <router-link to="/" class="list-group-item list-group-item-action" @click.prevent="logout">
                             Logout
                         </router-link>
@@ -79,6 +81,31 @@ const LibrarianDashboard = Vue.component('LibrarianDashboard', {
             })
             .catch(error => {
                 console.error('Logout Error:', error);
+            });
+        },
+        exportBooksCSV() {
+            fetch('/export-books-csv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('CSV export initiated successfully');
+                console.log(data); // Debug information
+            })
+            .catch(error => {
+                console.error('Failed to start CSV export:', error.message);
+                alert('Failed to start CSV export. Please check the console for more details.');
             });
         }
     }

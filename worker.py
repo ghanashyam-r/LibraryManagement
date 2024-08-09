@@ -1,11 +1,12 @@
-from celery import Celery, Task
+from celery import Celery
 
-def celery_init_app(app):
-    class FlaskTask(Task):
-        def __call__(self, *args: object, **kwargs: object) -> object:
-            with app.app_context():
-                return self.run(*args, **kwargs)
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config.get('CELERY_RESULT_BACKEND'),
+        broker=app.config.get('CELERY_BROKER_URL')
+    )
+    celery.conf.update(app.config)
+    celery.config_from_object('celeryconfig')
+    return celery
 
-    celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object("celeryconfig")
-    return celery_app

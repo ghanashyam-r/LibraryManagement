@@ -4,18 +4,21 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from database import db
 from models import User, Section, Book,Request, Feedback
 from werkzeug.security import check_password_hash, generate_password_hash
-from worker import celery_init_app
-
+from tasks import export_books_csv
+import flask_excel as excel
+from worker import make_celery
 app = Flask(__name__)
 app.secret_key = 'fefsdsdsfdsfr'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
 
+app.config.from_object('celeryconfig')
 jwt = JWTManager(app)
 db.init_app(app)
+excel.init_excel(app)
+celery = make_celery(app)
 
-celery_app = celery_init_app(app)
 # Ensure the app context is pushed and tables are created
 with app.app_context():
     db.create_all()
@@ -33,6 +36,21 @@ def user_identity_lookup(user):
 def user_lookup_callback(_jwt_header, _jwt_data):
     identity = _jwt_data['sub']
     return User.query.get(identity)
+
+@app.route('/export-books-csv', methods=['POST'])
+@jwt_required()
+def initiate_export_books_csv():
+    current_user = get_jwt_identity()
+    user = User.query.get(current_user)
+
+    if not user or user.role != 'admin':
+        return jsonify({'error': 'Unauthorized access'}), 403
+
+    # Trigger the Celery task
+    task = export_books_csv.delay(librarian_id=user.id)  # Call the Celery task
+
+    return jsonify({'message': 'CSV export initiated', 'task_id': task.id}), 202
+
 
 auth = Blueprint('auth', __name__)
 
