@@ -1,4 +1,3 @@
-// BorrowedBooks.js
 const BorrowedBooks = Vue.component('BorrowedBooks', {
     template: `
         <div class="container">
@@ -20,6 +19,7 @@ const BorrowedBooks = Vue.component('BorrowedBooks', {
                                 <p><strong>Author:</strong> {{ book.author }}</p>
                                 <p><strong>Date Issued:</strong> {{ book.date_issued }}</p>
                                 <p><strong>Return Date:</strong> {{ book.return_date }}</p>
+                                <button @click="returnBook(book.id)" class="btn btn-danger">Return Book</button>
                             </li>
                         </ul>
                     </div>
@@ -54,6 +54,27 @@ const BorrowedBooks = Vue.component('BorrowedBooks', {
             })
             .catch(error => {
                 console.error('Fetch Error:', error);
+            });
+        },
+        returnBook(bookId) {
+            fetch(`/books/${bookId}/return`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getToken()}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(data.message);
+                    this.fetchBorrowedBooks(); // Refresh the list after returning the book
+                }
+            })
+            .catch(error => {
+                console.error('Return Error:', error);
             });
         },
         getToken() {

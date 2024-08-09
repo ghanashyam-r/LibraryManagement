@@ -294,14 +294,21 @@ def return_book(book_id):
     current_user = get_jwt_identity()
     user = User.query.get(current_user)
     
-    # Find the request record
+    # Find the request record for the current user and the given book
     request_record = Request.query.filter_by(user_id=user.id, book_id=book_id, date_returned=None).first()
+    
     if not request_record:
-        return jsonify({'error': 'No record of this book being borrowed.'}), 404
+        return jsonify({'error': 'No record of this book being borrowed or already returned.'}), 404
 
+    # Update the request record
     request_record.date_returned = datetime.utcnow()
+    request_record.status = 'returned'  # Update status to 'returned'
+    
     db.session.commit()
+    
     return jsonify({'message': 'Book returned successfully.'}), 200
+
+
 @app.route('/books/<int:book_id>/feedback', methods=['POST'])
 @jwt_required()
 def give_feedback(book_id):
