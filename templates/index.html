@@ -23,6 +23,7 @@
         import ManageSections from '../static/views/ManageSections.js';
         import ManageBooks from '../static/views/ManageBooks.js';
         import ManageRequestsView from '../static/views/ManageRequestsView.js';
+        import ViewStatistics from '../static/views/ViewStatistics.js';
 
         const routes = [
             { path: '/', component: HomeView },
@@ -32,7 +33,8 @@
             { path: '/librariandashboard', component: LibrarianDashboard},
             { path: '/manage-sections', component: ManageSections },
             { path: '/manage-books', component: ManageBooks },
-            { path: '/manage-requests', component: ManageRequestsView }
+            { path: '/manage-requests', component: ManageRequestsView },
+            { path: '/view-statistics', component: ViewStatistics }
         ];
 
         const router = new VueRouter({

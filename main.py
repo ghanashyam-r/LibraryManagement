@@ -331,6 +331,31 @@ def revoke_request(request_id):
     request_record.date_returned = datetime.utcnow()
     db.session.commit()
     return jsonify({'message': 'Request revoked successfully.'}), 200
+
+@app.route('/api/admin/statistics', methods=['GET'])
+@jwt_required()
+def get_statistics():
+    # Check if the current user is an admin
+    current_user = get_jwt_identity()
+    user = User.query.get(current_user)
+    if user.role != 'admin':
+        return jsonify({'message': 'Access forbidden'}), 403
+
+    # Calculate statistics
+    active_users = User.query.count()  # Example count, adjust as needed
+    grant_requests = Request.query.filter_by(status='requested').count()
+    books_issued = Request.query.filter_by(status='issued').count()
+    books_revoked = Request.query.filter_by(status='revoked').count()
+    feedbacks_received = Feedback.query.count()
+
+    return jsonify({
+        'activeUsers': active_users-1,
+        'grantRequests': grant_requests,
+        'booksIssued': books_issued,
+        'booksRevoked': books_revoked,
+        'feedbacksReceived': feedbacks_received
+    })
+
 @app.route('/')
 def index():
     return render_template('index.html')
