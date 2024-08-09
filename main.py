@@ -160,6 +160,36 @@ def get_books():
 
     return jsonify(book_list), 200
 
+@app.route('/users/borrowed-books', methods=['GET'])
+@jwt_required()
+def get_borrowed_books():
+    current_user = get_jwt_identity()
+    
+    # Query for requests made by the current user that are approved and not yet returned
+    borrowed_requests = Request.query.filter_by(user_id=current_user, status='approved', date_returned=None).all()
+    
+    print(f"Borrowed Requests: {borrowed_requests}")  # Debug print statement
+
+    if not borrowed_requests:
+        return jsonify({'message': 'No borrowed books found'}), 404
+
+    borrowed_books = []
+    for request in borrowed_requests:
+        book = Book.query.get(request.book_id)
+        if book:
+            borrowed_books.append({
+                'id': book.id,
+                'name': book.name,
+                'author': book.author,
+                'section_name': book.section.name if book.section else 'Unknown',
+                'date_issued': request.date_requested.isoformat() if request.date_requested else None,
+                'return_date': book.return_date.isoformat() if book.return_date else None
+            })
+
+    print(f"Borrowed Books: {borrowed_books}")  # Debug print statement
+
+    return jsonify(borrowed_books), 200
+
 
 from datetime import datetime,timedelta
 

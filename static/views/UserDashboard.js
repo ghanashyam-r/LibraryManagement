@@ -29,7 +29,7 @@ const UserDashboard = Vue.component('UserDashboard', {
                                 <p class="card-text">{{ book.author }}</p>
                                 <p class="card-text"><strong>Section:</strong> {{ book.section_name }}</p>
                                 <button @click="requestBook(book.id)" class="btn btn-primary" :disabled="book.requested">Request Book</button>
-                                <button @click="returnBook(book.id)" class="btn btn-warning" :disabled="!book.requested">Return Book</button>
+                                
                                 <div class="mt-3">
                                     <h6>Give Feedback</h6>
                                     <input v-model="feedback[book.id].rating" placeholder="Rating" type="number" min="1" max="5" class="form-control">
