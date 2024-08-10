@@ -10,6 +10,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     requested_books = db.relationship('Request', backref='user', lazy=True)
     feedbacks = db.relationship('Feedback', backref='user', lazy=True)
+    last_login = db.Column(db.DateTime, nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

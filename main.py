@@ -73,6 +73,8 @@ def login():
     password = data.get("password")
     user = User.query.filter_by(username=username).first()
     if user and check_password_hash(user.password_hash, password):
+        user.last_login = datetime.utcnow()
+        db.session.commit()
         access_token = create_access_token(identity=user)
         response = jsonify({"msg": "login successful", "access_token": access_token, "role": user.role})
         set_access_cookies(response, access_token)
