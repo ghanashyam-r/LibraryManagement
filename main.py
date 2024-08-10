@@ -7,18 +7,24 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from tasks import export_books_csv
 import flask_excel as excel
 from worker import make_celery
+from instances import cache
+
 app = Flask(__name__)
 app.secret_key = 'fefsdsdsfdsfr'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
+app.config['CACHE_TYPE'] = "RedisCache"
+app.config['CACHE_REDIS_HOST'] = "localhost"
+app.config['CACHE_REDIS_PORT'] = 6379
+app.config['CACHE_REDIS_DB'] = 3
 
 app.config.from_object('celeryconfig')
 jwt = JWTManager(app)
 db.init_app(app)
 excel.init_excel(app)
 celery = make_celery(app)
-
+cache.init_app(app)
 # Ensure the app context is pushed and tables are created
 with app.app_context():
     db.create_all()
@@ -39,6 +45,7 @@ def user_lookup_callback(_jwt_header, _jwt_data):
 
 @app.route('/export-books-csv', methods=['POST'])
 @jwt_required()
+@cache.cached(timeout=90)
 def initiate_export_books_csv():
     current_user = get_jwt_identity()
     user = User.query.get(current_user)
@@ -160,6 +167,7 @@ def get_books_by_section(section_id):
 
 @app.route('/books', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=50)
 def get_books():
     books = db.session.query(
         Book.id, Book.name, Book.content, Book.author, Book.date_issued, Book.return_date, Book.section_id, Section.name.label('section_name')
@@ -391,6 +399,7 @@ def revoke_request(request_id):
 
 @app.route('/api/admin/statistics', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=50)
 def get_statistics():
     # Check if the current user is an admin
     current_user = get_jwt_identity()
