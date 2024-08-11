@@ -61,3 +61,4 @@ const LoginView = Vue.component('LoginView', {
 
 export default LoginView;
 
+

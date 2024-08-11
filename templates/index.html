@@ -30,17 +30,38 @@
             { path: '/', component: HomeView },
             { path: '/login', component: LoginView },
             { path: '/register', component: RegisterView },
-            { path: '/userdashboard', component: UserDashboard},
-            { path: '/librariandashboard', component: LibrarianDashboard},
-            { path: '/manage-sections', component: ManageSections },
-            { path: '/manage-books', component: ManageBooks },
-            { path: '/manage-requests', component: ManageRequestsView },
-            { path: '/view-statistics', component: ViewStatistics },
-            { path: '/borrowed-books', component: BorrowedBooks }
+            { path: '/userdashboard', component: UserDashboard, meta: { requiresAuth: true, role: 'user' } },
+            { path: '/librariandashboard', component: LibrarianDashboard, meta: { requiresAuth: true, role: 'admin' } },
+            { path: '/manage-sections', component: ManageSections, meta: { requiresAuth: true, role: 'admin' } },
+            { path: '/manage-books', component: ManageBooks, meta: { requiresAuth: true, role: 'admin' } },
+            { path: '/manage-requests', component: ManageRequestsView, meta: { requiresAuth: true, role: 'admin' } },
+            { path: '/view-statistics', component: ViewStatistics, meta: { requiresAuth: true, role: 'admin' } },
+            { path: '/borrowed-books', component: BorrowedBooks, meta: { requiresAuth: true, role: 'user' } }
         ];
 
         const router = new VueRouter({
             routes
+        });
+
+        router.beforeEach((to, from, next) => {
+            const isAuthenticated = localStorage.getItem('access_token');
+            const userRole = localStorage.getItem('user_role');
+            
+            if (to.matched.some(record => record.meta.requiresAuth)) {
+                if (!isAuthenticated) {
+                    // Not logged in, redirect to login page
+                    next('/login');
+                } else if (to.meta.role && to.meta.role !== userRole) {
+                    // Logged in but does not have the right role, redirect to home page or any other page
+                    next('/');
+                } else {
+                    // User has access
+                    next();
+                }
+            } else {
+                // Route does not require authentication
+                next();
+            }
         });
 
         var app = new Vue({
@@ -49,6 +70,4 @@
         });
     </script>
 </body>
-
-
 </html>
