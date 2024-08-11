@@ -1,5 +1,5 @@
 # main.py
-from flask import Flask, render_template, jsonify, request, Blueprint
+from flask import Flask, render_template, jsonify, request
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies
 from database import db
 from models import User, Section, Book,Request, Feedback
@@ -8,6 +8,7 @@ from tasks import export_books_csv
 import flask_excel as excel
 from worker import make_celery
 from instances import cache
+from sqlalchemy import or_
 
 app = Flask(__name__)
 app.secret_key = 'fefsdsdsfdsfr'
@@ -59,7 +60,6 @@ def initiate_export_books_csv():
     return jsonify({'message': 'CSV export initiated', 'task_id': task.id}), 202
 
 
-auth = Blueprint('auth', __name__)
 
 @app.route('/register', methods=['POST'])
 def signup_post():
@@ -406,11 +406,16 @@ def get_statistics():
     user = User.query.get(current_user)
     if user.role != 'admin':
         return jsonify({'message': 'Access forbidden'}), 403
-
+     
     # Calculate statistics
     active_users = User.query.count()  # Example count, adjust as needed
     grant_requests = Request.query.filter_by(status='requested').count()
-    books_issued = Request.query.filter_by(status='issued').count()
+    books_issued = Request.query.filter(
+    or_(
+        Request.status == 'approved',
+        Request.status == 'returned',
+        Request.status == 'revoked'
+        )).count()
     books_revoked = Request.query.filter_by(status='revoked').count()
     feedbacks_received = Feedback.query.count()
 

@@ -7,6 +7,8 @@ from flask import Flask
 from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from celeryconfig import timezone
+from celery.schedules import crontab
 
 # Create a Celery instance
 celery = Celery(__name__, broker='redis://localhost:6379/0')
@@ -17,6 +19,8 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     return app
+app = create_app()
+
 
 @celery.task(bind=True)
 def export_books_csv(self, librarian_id):
@@ -70,7 +74,7 @@ def send_daily_reminders():
 
     with app.app_context():
         now = datetime.now()
-        reminder_time = now.replace(hour=18, minute=0, second=0, microsecond=0)
+        reminder_time = now.replace(hour=12, minute=0, second=0, microsecond=0)
         if now > reminder_time:
             reminder_time += timedelta(days=1)
         
@@ -91,3 +95,13 @@ def send_daily_reminders():
                 subject = 'Reminder: Book Return Due Soon'
                 body = f'Hello {user.username},<br><br>You have books that need to be returned soon. Please return them by the due date.<br><br>Best regards,<br>Library Management System'
                 send_message(user.email, subject, body)
+
+
+
+@celery.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(minute='*/1'),  
+        send_daily_reminders.s(),
+        name='daily'
+    )

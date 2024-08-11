@@ -1,5 +1,7 @@
+
 const ManageBooks = Vue.component('ManageBooks', {
     template: `
+        
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -49,6 +51,7 @@ const ManageBooks = Vue.component('ManageBooks', {
                 </div>
             </div>
         </div>
+        
     `,
     data() {
         return {
