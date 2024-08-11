@@ -13,7 +13,7 @@ Celery Worker
 ./run_celery.sh
 
 Celery Beat
-
+./run_celery_beat.sh
 
 Mailhog
 ./run_mailhog.sh 
