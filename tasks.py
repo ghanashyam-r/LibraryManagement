@@ -82,7 +82,7 @@ def send_daily_reminders():
         
         users = db.session.query(User).all()
         for user in users:
-            if user.role=='user':
+            if user.last_login is None or (now - user.last_login).days > 1:
                 subject = 'Reminder to Visit Library'
                 body = f'Hello {user.username},<br><br>Please visit the library to return or borrow books.<br><br>Best regards,<br>Library Management System'
                 send_message(user.email, subject, body)
