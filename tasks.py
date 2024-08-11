@@ -103,7 +103,7 @@ def send_daily_reminders():
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute='*/1'),  
+        crontab(hour=12, minute=0, second=0, microsecond=0),  
         send_daily_reminders.s(),
         name='daily'
     )

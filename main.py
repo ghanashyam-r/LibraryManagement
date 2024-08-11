@@ -191,6 +191,7 @@ def get_books():
     return jsonify(book_list), 200
 
 @app.route('/users/borrowed-books', methods=['GET'])
+@cache.cached(timeout=50)
 @jwt_required()
 def get_borrowed_books():
     current_user = get_jwt_identity()
