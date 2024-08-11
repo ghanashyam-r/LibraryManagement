@@ -1,15 +1,20 @@
 # LibraryManagement
-Vue+flask app with CDN approach to build music streaming app.
+Vue-Flask App to buid E-Library Management System
 
-To create virtual env..
 python3 -m venv .env
 
-to activate virtual environment activation
-. local_run.sh
+to activate and run main.py through virtual environment
+./run_local.sh
 
-pip install flask
-pip install Flask-SQLAlchemy
+Redis
+./run_redis.sh
 
-vue2 for frontend
-to install all the dependencies from requirements.txt
-pip install -r requirements.txt
+Celery Worker
+./run_celery.sh
+
+Celery Beat
+
+
+Mailhog
+./run_mailhog.sh 
+
