@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Activity Report</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monthly Activity Report</h1>
+
+    <h2>Sections</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Section Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for section in sections %}
+                <tr>
+                    <td>{{ section.name }}</td>
+                    <td>{{ section.description }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Books Issued</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Book Name</th>
+                <th>Content</th>
+                <th>Author</th>
+                <th>Date Issued</th>
+                <th>Section Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in issued_books %}
+                <tr>
+                    <td>{{ book.book_name }}</td>
+                    <td>{{ book.content }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.date_issued }}</td>
+                    <td>{{ book.section_name }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Ratings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Book Name</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rating in ratings %}
+                <tr>
+                    <td>{{ rating.book_name }}</td>
+                    <td>{{ rating.rating }}</td>
+                    <td>{{ rating.comment }}</td>
+                    <td>{{ rating.date_created }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Number of Users Logged In This Month</h2>
+    <p>{{ user_logins }}</p>
+
+</body>
+</html>

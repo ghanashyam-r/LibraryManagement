@@ -9,6 +9,7 @@ import flask_excel as excel
 from worker import make_celery
 from instances import cache
 from sqlalchemy import or_
+from jinja2 import Template
 
 app = Flask(__name__)
 app.secret_key = 'fefsdsdsfdsfr'
@@ -106,6 +107,7 @@ def user_info():
         }), 200
     else:
         return jsonify({'error': 'User not found'}), 404
+
 
 # Section Management Routes
 @app.route('/sections', methods=['POST'])
