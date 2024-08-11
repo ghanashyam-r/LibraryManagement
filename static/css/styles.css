@@ -40,29 +40,6 @@
 
 
 
-.user-dashboard-container {
-    background-image: url('../assets/user.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: blur(8px); /* Blurs the background image */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Ensure the background stays behind all content */
-}
-
-.user-dashboard-content {
-    position: relative;
-    z-index: 1;
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background for the content */
-    padding: 20px;
-    border-radius: 10px;
-}
-
-
 
 
 

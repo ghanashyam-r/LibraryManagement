@@ -1,29 +1,35 @@
 const LibrarianDashboard = Vue.component('LibrarianDashboard', {
     template: `
-        <div class="container">
+        <div class="container mt-5">
             <div class="row">
                 <div class="col-12">
-                    <h2 class="mt-5">Welcome Librarian</h2>
-                    <p>Email: {{ user.email }}</p>
-                    <div class="list-group mt-4">
-                        <router-link to="/manage-sections" class="list-group-item list-group-item-action">
-                            Manage Sections
-                        </router-link>
-                        <router-link to="/manage-books" class="list-group-item list-group-item-action">
-                            Manage Books
-                        </router-link>
-                        <router-link to="/view-statistics" class="list-group-item list-group-item-action">
-                            View Statistics
-                        </router-link>
-                        <router-link to="/manage-requests" class="list-group-item list-group-item-action">
-                            View and Manage User Requests
-                        </router-link>
-                        <button @click="exportBooksCSV" class="list-group-item list-group-item-action">
-                            Export Books as CSV
-                        </button>
-                        <router-link to="/" class="list-group-item list-group-item-action" @click.prevent="logout">
-                            Logout
-                        </router-link>
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="mb-0">Welcome Librarian</h2>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Email: {{ user.email }}</p>
+                            <div class="list-group mt-4">
+                                <router-link to="/manage-sections" class="list-group-item list-group-item-action">
+                                    Manage Sections
+                                </router-link>
+                                <router-link to="/manage-books" class="list-group-item list-group-item-action">
+                                    Manage Books
+                                </router-link>
+                                <router-link to="/view-statistics" class="list-group-item list-group-item-action">
+                                    View Statistics
+                                </router-link>
+                                <router-link to="/manage-requests" class="list-group-item list-group-item-action">
+                                    View and Manage User Requests
+                                </router-link>
+                                <button @click="exportBooksCSV" class="list-group-item list-group-item-action btn btn-success">
+                                    Export Books as CSV
+                                </button>
+                                <router-link to="/" class="list-group-item list-group-item-action btn btn-danger" @click.prevent="logout">
+                                    Logout
+                                </router-link>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
