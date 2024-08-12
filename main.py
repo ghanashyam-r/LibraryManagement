@@ -169,7 +169,6 @@ def get_books_by_section(section_id):
 
 @app.route('/books', methods=['GET'])
 @jwt_required()
-@cache.cached(timeout=50)
 def get_books():
     books = db.session.query(
         Book.id, Book.name, Book.content, Book.author, Book.date_issued, Book.return_date, Book.section_id, Section.name.label('section_name')
