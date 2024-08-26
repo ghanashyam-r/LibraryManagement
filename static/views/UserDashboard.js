@@ -9,6 +9,25 @@ const UserDashboard = Vue.component('UserDashboard', {
                 </form>
                 <!-- Removed username and email from navbar -->
             </nav>
+            <!-- Carousel Start -->
+          <div id="libraryCarousel" class="carousel slide mt-4" data-ride="carousel">
+            <div class="carousel-inner">
+              <div class="carousel-item" v-for="(image, index) in carouselImages" :key="index" :class="{ active: index === 0 }">
+                <img :src="image" class="d-block w-100" alt="Library Image">
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <a class="carousel-control-prev" href="#libraryCarousel" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#libraryCarousel" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+          <!-- Carousel End -->
             <div class="row">
                 <div class="col-12">
                     <h2 class="mt-5">Welcome, {{ user.username }}!</h2>
@@ -50,6 +69,12 @@ const UserDashboard = Vue.component('UserDashboard', {
                 email: ''
             },
             books: [],
+            carouselImages: [  // Array to hold image paths
+                '/static/assets/Carousal1.png',
+                '/static/assets/Carousal2.png',
+                'static/assets/Carousel3.png'
+                
+              ],
             feedback: {},
             searchQuery: ''
         };
