@@ -1,65 +1,77 @@
 const UserDashboard = Vue.component('UserDashboard', {
     template: `
-        <div class="container">
-            <nav class="navbar navbar-light bg-light mb-4">
-                <a class="navbar-brand" href="#">Library</a>
-                <form class="form-inline d-flex w-50" @submit.prevent="search">
-                    <input class="form-control mr-2 flex-grow-1" type="search" placeholder="Search books or sections" v-model="searchQuery" />
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-                <!-- Removed username and email from navbar -->
-            </nav>
-            <!-- Carousel Start -->
-          <div id="libraryCarousel" class="carousel slide mt-4" data-ride="carousel">
-            <div class="carousel-inner">
-              <div class="carousel-item" v-for="(image, index) in carouselImages" :key="index" :class="{ active: index === 0 }">
-                <img :src="image" class="d-block w-100" alt="Library Image">
-              </div>
+        <div class="d-flex">
+            <!-- Sidebar Start -->
+            <div class="sidebar bg-light p-3">
+                <h4 class="mb-4">{{ user.username }}</h4>
+                <div class="list-group list-group-flush">
+                    <router-link to="/borrowed-books" class="list-group-item list-group-item-action">
+                        View Borrowed Books
+                    </router-link>
+                    <router-link to="/" class="list-group-item list-group-item-action" @click.prevent="logout">
+                        Logout
+                    </router-link>
+                </div>
             </div>
+            <!-- Sidebar End -->
 
-            <!-- Controls -->
-            <a class="carousel-control-prev" href="#libraryCarousel" role="button" data-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#libraryCarousel" role="button" data-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
-            </a>
-          </div>
-          <!-- Carousel End -->
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mt-5">Welcome, {{ user.username }}!</h2>
-                    <p>Email: {{ user.email }}</p>
-                    <div class="list-group mt-4">
-                        <router-link to="/borrowed-books" class="list-group-item list-group-item-action">
-                            View Borrowed Books
-                        </router-link>
-                        <router-link to="/" class="list-group-item list-group-item-action" @click.prevent="logout">
-                            Logout
-                        </router-link>
+            <!-- Main Content Start -->
+            <div class="main-content flex-grow-1">
+                <nav class="navbar navbar-light bg-light mb-4">
+    <a class="navbar-brand" href="#">Library</a>
+    <form class="form-inline d-flex w-50" @submit.prevent="search">
+        <input class="form-control mr-2 flex-grow-1" type="search" placeholder="Search books or sections" v-model="searchQuery" />
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+</nav>
+
+                <!-- Carousel Start -->
+                <div id="libraryCarousel" class="carousel slide mt-4" data-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item" v-for="(image, index) in carouselImages" :key="index" :class="{ active: index === 0 }">
+                            <img :src="image" class="d-block w-100" alt="Library Image">
+                        </div>
                     </div>
+                    <!-- Controls -->
+                    <a class="carousel-control-prev" href="#libraryCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#libraryCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+                <!-- Carousel End -->
+
+                <div class="row">
+                <div class="col-12">
                     <div class="mt-4">
                         <h3>Available Books</h3>
-                        <div v-for="book in filteredBooks" :key="book.id" class="card mb-2">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ book.name }}</h5>
-                                <p class="card-text">{{ book.author }}</p>
-                                <p class="card-text"><strong>Section:</strong> {{ book.section_name }}</p>
-                                <button @click="requestBook(book.id)" class="btn btn-primary" :disabled="book.requested">Request Book</button>
-                                
-                                <div class="mt-3">
-                                    <h6>Give Feedback</h6>
-                                    <input v-model="feedback[book.id].rating" placeholder="Rating" type="number" min="1" max="5" class="form-control">
-                                    <textarea v-model="feedback[book.id].comment" placeholder="Comment" class="form-control mt-2"></textarea>
-                                    <button @click="giveFeedback(book.id)" class="btn btn-success mt-2">Submit Feedback</button>
+                        <!-- Use Bootstrap's grid system to control the number of cards per row -->
+                        <div class="row">
+                            <div v-for="book in filteredBooks" :key="book.id" class="col-md-4 mb-3"> <!-- Adjust width using Bootstrap grid classes -->
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ book.name }}</h5>
+                                        <p class="card-text">{{ book.author }}</p>
+                                        <p class="card-text"><strong>Section:</strong> {{ book.section_name }}</p>
+                                        <button @click="requestBook(book.id)" class="btn btn-primary" :disabled="book.requested">Request Book</button>
+                                        <div class="mt-3">
+                                            <h6>Give Feedback</h6>
+                                            <input v-model="feedback[book.id].rating" placeholder="Rating" type="number" min="1" max="5" class="form-control">
+                                            <textarea v-model="feedback[book.id].comment" placeholder="Comment" class="form-control mt-2"></textarea>
+                                            <button @click="giveFeedback(book.id)" class="btn btn-success mt-2">Submit Feedback</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+            <!-- Main Content End -->
         </div>
     `,
     data() {
@@ -69,12 +81,11 @@ const UserDashboard = Vue.component('UserDashboard', {
                 email: ''
             },
             books: [],
-            carouselImages: [  // Array to hold image paths
+            carouselImages: [
                 '/static/assets/Carousal1.png',
                 '/static/assets/Carousal2.png',
                 'static/assets/Carousel3.png'
-                
-              ],
+            ],
             feedback: {},
             searchQuery: ''
         };
@@ -224,3 +235,4 @@ const UserDashboard = Vue.component('UserDashboard', {
 });
 
 export default UserDashboard;
+

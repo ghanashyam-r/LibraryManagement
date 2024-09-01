@@ -7,6 +7,7 @@ Run these in separate terminals
 mailhog
 
 3.Redis Server
+redis-server
 redis-cli
 
 4.Celery worker
