@@ -1,46 +1,57 @@
 const ManageSections = Vue.component('ManageSections', {
     template: `
-        <div class="container">
+        <div class="container my-5">
+
+            <!-- Navbar -->
+            <nav class="navbar navbar-light bg-light mb-4">
+                <a class="navbar-brand" href="#">Librarian Dashboard</a>
+                <router-link to="/librariandashboard" class="btn btn-primary">Back to Dashboard</router-link>
+            </nav>
+            
+            <!-- Section Management Header -->
             <div class="row">
                 <div class="col-12">
-                    <h2 class="mt-5">Manage Sections</h2>
-                    <form @submit.prevent="createSection">
-                        <div class="mb-3">
-                            <label for="sectionName" class="form-label">Section Name</label>
-                            <input type="text" v-model="newSection.name" class="form-control" id="sectionName" required>
+                    <h2 class="text-center mb-4">Manage Sections</h2>
+                    <button class="btn btn-primary mb-3" @click="showCreateSectionForm">Create Section</button>
+                    
+                    <!-- Section Form Start -->
+                    <div v-if="showForm" class="card mb-4">
+                        <div class="card-header">
+                            <h5>{{ formMode }} Section</h5>
                         </div>
-                        <div class="mb-3">
-                            <label for="sectionDescription" class="form-label">Description</label>
-                            <textarea v-model="newSection.description" class="form-control" id="sectionDescription"></textarea>
+                        <div class="card-body">
+                            <form @submit.prevent="handleSubmit">
+                                <div class="mb-3">
+                                    <label for="sectionName" class="form-label">Section Name</label>
+                                    <input type="text" v-model="section.name" class="form-control" id="sectionName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sectionDescription" class="form-label">Description</label>
+                                    <textarea v-model="section.description" class="form-control" id="sectionDescription"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-success">{{ formMode }}</button>
+                                    <button type="button" class="btn btn-secondary" @click="hideForm">Cancel</button>
+                                </div>
+                            </form>
                         </div>
-                        <button type="submit" class="btn btn-primary">Create Section</button>
-                    </form>
-
-                    <h3 class="mt-5">Existing Sections</h3>
-                    <ul class="list-group">
-                        <li v-for="section in sections" :key="section.id" class="list-group-item">
-                            <h5>{{ section.name }}</h5>
-                            <p>{{ section.description }}</p>
-                            <button @click="startEditSection(section)" class="btn btn-warning btn-sm">Edit</button>
-                            <button @click="deleteSection(section.id)" class="btn btn-danger btn-sm">Delete</button>
-                        </li>
-                    </ul>
-
-                    <div v-if="editedSection" class="mt-5">
-                        <h3>Edit Section</h3>
-                        <form @submit.prevent="updateSection">
-                            <div class="mb-3">
-                                <label for="editSectionName" class="form-label">Section Name</label>
-                                <input type="text" v-model="editedSection.name" class="form-control" id="editSectionName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editSectionDescription" class="form-label">Description</label>
-                                <textarea v-model="editedSection.description" class="form-control" id="editSectionDescription"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Update Section</button>
-                            <button @click="cancelEdit" class="btn btn-secondary">Cancel</button>
-                        </form>
                     </div>
+                    <!-- Section Form End -->
+
+                    <!-- Section List Start -->
+                    <div class="list-group">
+                        <li v-for="section in sections" :key="section.id" class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">{{ section.name }}</h5>
+                                <p class="mb-0 text-muted">{{ section.description }}</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-warning btn-sm me-2" @click="startEditSection(section)">Edit</button>
+                                <button class="btn btn-danger btn-sm" @click="deleteSection(section.id)">Delete</button>
+                            </div>
+                        </li>
+                    </div>
+                    <!-- Section List End -->
                 </div>
             </div>
         </div>
@@ -48,10 +59,12 @@ const ManageSections = Vue.component('ManageSections', {
     data() {
         return {
             sections: [],
-            newSection: {
+            section: {
                 name: '',
                 description: ''
             },
+            showForm: false,
+            formMode: 'Create',
             editedSection: null
         };
     },
@@ -75,6 +88,23 @@ const ManageSections = Vue.component('ManageSections', {
                 console.error('Fetch Sections Error:', error);
             });
         },
+        showCreateSectionForm() {
+            this.formMode = 'Create';
+            this.section = { name: '', description: '' };
+            this.showForm = true;
+        },
+        startEditSection(section) {
+            this.formMode = 'Edit';
+            this.section = { ...section };
+            this.showForm = true;
+        },
+        handleSubmit() {
+            if (this.formMode === 'Create') {
+                this.createSection();
+            } else {
+                this.updateSection();
+            }
+        },
         createSection() {
             fetch('/sections', {
                 method: 'POST',
@@ -82,35 +112,31 @@ const ManageSections = Vue.component('ManageSections', {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.getToken()}`
                 },
-                body: JSON.stringify(this.newSection)
+                body: JSON.stringify(this.section)
             })
             .then(response => response.json())
             .then(data => {
                 this.sections.push(data);
-                this.newSection.name = '';
-                this.newSection.description = '';
+                this.showForm = false;
             })
             .catch(error => {
                 console.error('Create Section Error:', error);
             });
         },
-        startEditSection(section) {
-            this.editedSection = { ...section };
-        },
         updateSection() {
-            fetch(`/sections/${this.editedSection.id}`, {
+            fetch(`/sections/${this.section.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.getToken()}`
                 },
-                body: JSON.stringify(this.editedSection)
+                body: JSON.stringify(this.section)
             })
             .then(response => response.json())
             .then(updatedSection => {
-                const index = this.sections.findIndex(section => section.id === updatedSection.id);
+                const index = this.sections.findIndex(s => s.id === updatedSection.id);
                 this.$set(this.sections, index, updatedSection);
-                this.editedSection = null;
+                this.showForm = false;
             })
             .catch(error => {
                 console.error('Update Section Error:', error);
@@ -133,8 +159,8 @@ const ManageSections = Vue.component('ManageSections', {
                 console.error('Delete Section Error:', error);
             });
         },
-        cancelEdit() {
-            this.editedSection = null;
+        hideForm() {
+            this.showForm = false;
         },
         getToken() {
             return localStorage.getItem('access_token');

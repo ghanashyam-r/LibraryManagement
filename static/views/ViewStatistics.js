@@ -1,6 +1,11 @@
 export default {
     template: `
     <div class="container mt-5">
+    <!-- Navbar -->
+            <nav class="navbar navbar-light bg-light mb-4">
+                <a class="navbar-brand" href="#">Librarian Dashboard</a>
+                <router-link to="/librariandashboard" class="btn btn-primary">Back to Dashboard</router-link>
+            </nav>
         <h2 class="text-center mb-4">Admin Dashboard - Statistics</h2>
         <div class="row">
             <!-- Active Users -->
