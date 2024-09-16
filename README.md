@@ -45,6 +45,8 @@ A comprehensive multi-user application designed to manage e-books across various
 **Other Technologies:** Jinja2 (for server-side rendering of monthly report), Mailhog (for email simulation)
 
 ## Screenshots
+### Landing Page 
+![Library · 6 10pm · 09-16](https://github.com/user-attachments/assets/9ee18ea0-133e-4a2d-a611-6e71b3a672c5)
 ### User Dashboard
 ![Library](https://github.com/user-attachments/assets/3a947ed0-edce-4625-bc48-670c5dae5cc0)
 ### Search Functionality
