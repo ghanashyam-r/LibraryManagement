@@ -1,6 +1,10 @@
 const ManageRequestsView = Vue.component('ManageRequestsView', {
     template: `
         <div class="container">
+        <nav class="navbar navbar-light bg-light mb-4">
+            <a class="navbar-brand" href="#">Librarian Dashboard</a>
+            <router-link to="/librariandashboard" class="btn btn-primary">Back to Dashboard</router-link>
+          </nav>
             <h2 class="mt-5">Manage Requests</h2>
             <div v-if="requests.length">
                 <table class="table">
