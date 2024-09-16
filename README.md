@@ -48,7 +48,7 @@ A comprehensive multi-user application designed to manage e-books across various
 ### Landing Page 
 ![Library · 6 10pm · 09-16](https://github.com/user-attachments/assets/9ee18ea0-133e-4a2d-a611-6e71b3a672c5)
 ### User Dashboard
-![Library](https://github.com/user-attachments/assets/3a947ed0-edce-4625-bc48-670c5dae5cc0)
+![Library](https://github.com/user-attachments/assets/94f40190-b92f-4230-a0dc-46b228e0b493)
 ### Search Functionality
 ![Library · 5 29pm · 09-16](https://github.com/user-attachments/assets/e55d4082-3a10-444a-baa1-6c88ae63d738)
 ### Borrowed Books
